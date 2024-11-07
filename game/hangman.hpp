@@ -5,8 +5,15 @@
 
 class Hangman {
 private:
+  static const int HEIGHT = 7;
+  static const int WIDTH = 10;
+
   std::fstream *file;
+  int remaining_attempts;
+  char hangman[HEIGHT][WIDTH];
+
   void close();
+  void init();
 
 public:
   Hangman(const std::string &);

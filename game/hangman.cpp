@@ -15,6 +15,22 @@ void Hangman::close() {
   }
 }
 
+void Hangman::init() {
+  for (int i = 0; i < this->HEIGHT; ++i) {
+    for (int j = 0; j < this->WIDTH; ++j) {
+      this->hangman[i][j] = ' ';
+    }
+  }
+
+  for (int i = 0; i < this->HEIGHT; ++i) {
+    this->hangman[i][0] = '|';
+  }
+  for (int j = 0; j < 6; ++j) {
+    this->hangman[0][j] = '-';
+  }
+  this->hangman[1][5] = '|';
+}
+
 Hangman::~Hangman() {
   if (file) {
     close();
