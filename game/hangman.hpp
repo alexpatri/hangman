@@ -19,7 +19,7 @@ private:
   void increase_fails(int);
 
 public:
-  Hangman(const std::string &, int);
+  Hangman(const std::string &);
   ~Hangman();
 
   void start();
