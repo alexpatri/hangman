@@ -14,10 +14,13 @@ private:
 
   void close();
   void init();
+  void print();
 
 public:
   Hangman(const std::string &);
   ~Hangman();
+
+  void start();
 };
 
 #endif // !HANGMAN_
