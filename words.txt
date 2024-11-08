@@ -1,0 +1,4 @@
+computador,dispositivo eletrônico
+guitarra,instrumento musical
+pentatlo moderno,esportes olímpico
+sombrero,usado na cabeça
