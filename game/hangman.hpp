@@ -22,7 +22,7 @@ private:
 
   void init();
   void close();
-  void print();
+  void print(const std::string &);
   void increase_fails(int);
   Word get_random_word();
 

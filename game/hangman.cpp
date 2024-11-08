@@ -1,13 +1,17 @@
 #include "hangman.hpp"
 #include "utils/utils.hpp"
 
+#include <algorithm>
+#include <cstdlib>
+#include <ctime>
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
 
 hangman::Hangman::Hangman(const std::string &file_path) {
-  file = new std::fstream(file_path, std::fstream::out | std::fstream::app);
+  file = new std::fstream(file_path, std::fstream::out | std::fstream::app |
+                                         std::fstream::in);
 
   if (!file->is_open()) {
     throw std::runtime_error("Não foi possível abrir o arquivo.");
@@ -65,7 +69,7 @@ void hangman::Hangman::increase_fails(int qtd) {
     this->hangman[4][6] = '\\';
 }
 
-void hangman::Hangman::print() {
+void hangman::Hangman::print(const std::string &word_display) {
   for (int i = 0; i < this->HEIGHT; ++i) {
     std::cout << '\t';
     for (int j = 0; j < this->WIDTH; ++j) {
@@ -73,10 +77,16 @@ void hangman::Hangman::print() {
     }
     std::cout << '\n';
   }
+
+  std::cout << "Palavra: ";
+  for (char c : word_display) {
+    std::cout << c << ' ';
+  }
+  std::cout << '\n';
 }
 
 hangman::Word hangman::Hangman::get_random_word() {
-  if (!file->is_open()) {
+  if (!file || !file->is_open()) {
     throw std::runtime_error("Arquivo não está aberto.");
   }
 
@@ -84,9 +94,7 @@ hangman::Word hangman::Hangman::get_random_word() {
   file->seekg(0, std::ios::beg);
 
   int qtd_rows = 0;
-
   std::string row;
-
   while (std::getline(*file, row)) {
     qtd_rows++;
   }
@@ -95,6 +103,7 @@ hangman::Word hangman::Hangman::get_random_word() {
     throw std::runtime_error("Arquivo está vazio.");
   }
 
+  std::srand(std::time(0));
   int index = std::rand() % qtd_rows;
 
   file->clear();
@@ -114,9 +123,56 @@ hangman::Word hangman::Hangman::get_random_word() {
 
 void hangman::Hangman::start() {
   this->init();
-  this->print();
-  this->increase_fails(6);
-  this->print();
+
+  hangman::Word word = this->get_random_word();
+
+  std::string word_display(word.word.length(), '_');
+  std::string guessed_letters;
+
+  while (this->fails < this->max_attempts) {
+    std::cout << "Dica: " << word.hint << '\n';
+
+    this->print(word_display);
+    std::cout << "Tentativas restantes: " << (this->max_attempts - this->fails)
+              << '\n';
+    std::cout << "Letras já tentadas: " << guessed_letters << '\n';
+
+    char guess;
+    std::cout << "Digite uma letra: ";
+    std::cin >> guess;
+
+    if (guessed_letters.find(guess) != std::string::npos) {
+      utils::clear_screan();
+      std::cout << "Você já tentou essa letra.\n";
+      continue;
+    }
+
+    guessed_letters += guess;
+
+    bool found = false;
+    for (size_t i = 0; i < word.word.length(); ++i) {
+      if (word.word[i] == guess) {
+        word_display[i] = guess;
+        found = true;
+      }
+    }
+
+    if (!found) {
+      std::cout << "Letra incorreta!\n";
+      this->increase_fails(1);
+    }
+
+    utils::clear_screan();
+
+    if (word_display == word.word) {
+      std::cout << "Parabéns! Você acertou a palavra: " << word.word << '\n';
+      this->print(word_display);
+      return;
+    }
+  }
+
+  std::cout << "Você perdeu! A palavra era: " << word.word << '\n';
+  this->print(word_display);
 }
 
 hangman::Hangman::~Hangman() {
@@ -124,4 +180,8 @@ hangman::Hangman::~Hangman() {
     close();
     delete file;
   }
+}
+
+hangman::Hangman *hangman::new_game(const std::string &file_path) {
+  return new hangman::Hangman(file_path);
 }
