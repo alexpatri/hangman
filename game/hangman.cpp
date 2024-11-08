@@ -1,11 +1,11 @@
 #include "hangman.hpp"
 #include "utils/utils.hpp"
 
-#include <algorithm>
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -128,22 +128,28 @@ void hangman::Hangman::get_new_word_from_user() {
   std::cout << "Parabéns! Você venceu! Como recompensa, adicione uma nova "
                "palavra para o jogo.\n";
 
-  std::cout << "Digite a nova palavra: ";
-  std::cin.ignore();
-  std::getline(std::cin, new_word);
+  std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-  if (new_word.empty()) {
-    std::cout << "A palavra não pode ser vazia. Tente novamente." << std::endl;
-    return;
+  while (true) {
+    std::cout << "Digite a nova palavra: ";
+    std::getline(std::cin, new_word);
+
+    if (!new_word.empty()) {
+      break;
+    }
+
+    std::cout << "A palavra não pode ser vazia. Tente novamente.\n";
   }
 
-  std::cout << "Digite uma dica para a palavra: ";
-  std::cin.ignore();
-  std::getline(std::cin, new_hint);
+  while (true) {
+    std::cout << "Digite uma dica para a palavra: ";
+    std::getline(std::cin, new_hint);
 
-  if (new_hint.empty()) {
-    std::cout << "A dica não pode ser vazia. Tente novamente." << std::endl;
-    return;
+    if (!new_hint.empty()) {
+      break;
+    }
+
+    std::cout << "A dica não pode ser vazia. Tente novamente.\n";
   }
 
   file->clear();
@@ -151,7 +157,7 @@ void hangman::Hangman::get_new_word_from_user() {
 
   *file << new_word << "," << new_hint << std::endl;
 
-  std::cout << "Nova palavra e dica adicionadas com sucesso!" << std::endl;
+  std::cout << "Nova palavra e dica adicionadas com sucesso!\n";
 }
 
 void hangman::Hangman::start() {
