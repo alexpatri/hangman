@@ -25,6 +25,7 @@ private:
   void print(const std::string &);
   void increase_fails(int);
   Word get_random_word();
+  void get_new_word_from_user();
 
 public:
   Hangman(const std::string &);

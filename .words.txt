@@ -1,4 +1,4 @@
 computador,dispositivo eletrônico
 guitarra,instrumento musical
-taekwondo,esportes olímpico
+taekwondo,esporte olímpico
 sombrero,usado na cabeça

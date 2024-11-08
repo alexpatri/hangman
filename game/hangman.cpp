@@ -121,6 +121,39 @@ hangman::Word hangman::Hangman::get_random_word() {
   return word;
 }
 
+void hangman::Hangman::get_new_word_from_user() {
+  std::string new_word;
+  std::string new_hint;
+
+  std::cout << "Parabéns! Você venceu! Como recompensa, adicione uma nova "
+               "palavra para o jogo.\n";
+
+  std::cout << "Digite a nova palavra: ";
+  std::cin.ignore();
+  std::getline(std::cin, new_word);
+
+  if (new_word.empty()) {
+    std::cout << "A palavra não pode ser vazia. Tente novamente." << std::endl;
+    return;
+  }
+
+  std::cout << "Digite uma dica para a palavra: ";
+  std::cin.ignore();
+  std::getline(std::cin, new_hint);
+
+  if (new_hint.empty()) {
+    std::cout << "A dica não pode ser vazia. Tente novamente." << std::endl;
+    return;
+  }
+
+  file->clear();
+  file->seekp(0, std::ios::end);
+
+  *file << new_word << "," << new_hint << std::endl;
+
+  std::cout << "Nova palavra e dica adicionadas com sucesso!" << std::endl;
+}
+
 void hangman::Hangman::start() {
   this->init();
 
@@ -167,6 +200,7 @@ void hangman::Hangman::start() {
     if (word_display == word.word) {
       std::cout << "Parabéns! Você acertou a palavra: " << word.word << '\n';
       this->print(word_display);
+      this->get_new_word_from_user();
       return;
     }
   }
