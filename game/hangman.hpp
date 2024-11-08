@@ -9,15 +9,17 @@ private:
   static const int WIDTH = 10;
 
   std::fstream *file;
-  int remaining_attempts;
+  int max_attempts;
+  int fails;
   char hangman[HEIGHT][WIDTH];
 
   void close();
   void init();
   void print();
+  void increase_fails(int);
 
 public:
-  Hangman(const std::string &);
+  Hangman(const std::string &, int);
   ~Hangman();
 
   void start();

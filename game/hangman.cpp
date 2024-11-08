@@ -3,12 +3,13 @@
 #include <fstream>
 #include <iostream>
 
-Hangman::Hangman(const std::string &file_path) {
+Hangman::Hangman(const std::string &file_path, int max_attempts) {
   file = new std::fstream(file_path, std::fstream::out | std::fstream::app);
-
   if (!file->is_open()) {
     throw std::runtime_error("Não foi possível abrir o arquivo.");
   }
+  this->max_attempts = max_attempts;
+  this->fails = 0;
 }
 
 void Hangman::close() {
@@ -23,7 +24,6 @@ void Hangman::init() {
       this->hangman[i][j] = ' ';
     }
   }
-
   for (int i = 0; i < this->HEIGHT; ++i) {
     this->hangman[i][0] = '|';
   }
@@ -31,6 +31,13 @@ void Hangman::init() {
     this->hangman[0][j] = '-';
   }
   this->hangman[1][5] = '|';
+}
+
+void Hangman::increase_fails(int qtd) {
+  this->fails += qtd;
+  if (this->fails > this->max_attempts) {
+    this->fails = this->max_attempts;
+  }
 }
 
 void Hangman::print() {
