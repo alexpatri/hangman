@@ -3,6 +3,13 @@
 
 #include <fstream>
 
+namespace hangman {
+
+typedef struct {
+  std::string word;
+  std::string hint;
+} Word;
+
 class Hangman {
 private:
   static const int HEIGHT = 7;
@@ -13,10 +20,11 @@ private:
   int fails;
   char hangman[HEIGHT][WIDTH];
 
-  void close();
   void init();
+  void close();
   void print();
   void increase_fails(int);
+  Word get_random_word();
 
 public:
   Hangman(const std::string &);
@@ -24,5 +32,9 @@ public:
 
   void start();
 };
+
+Hangman *new_game(const std::string &);
+
+} // namespace hangman
 
 #endif // !HANGMAN_

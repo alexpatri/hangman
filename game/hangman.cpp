@@ -1,9 +1,12 @@
 #include "hangman.hpp"
+#include "utils/utils.hpp"
 
 #include <fstream>
 #include <iostream>
+#include <string>
+#include <vector>
 
-Hangman::Hangman(const std::string &file_path) {
+hangman::Hangman::Hangman(const std::string &file_path) {
   file = new std::fstream(file_path, std::fstream::out | std::fstream::app);
 
   if (!file->is_open()) {
@@ -14,13 +17,7 @@ Hangman::Hangman(const std::string &file_path) {
   this->fails = 0;
 }
 
-void Hangman::close() {
-  if (file && file->is_open()) {
-    file->close();
-  }
-}
-
-void Hangman::init() {
+void hangman::Hangman::init() {
   for (int i = 0; i < this->HEIGHT; ++i) {
     for (int j = 0; j < this->WIDTH; ++j) {
       this->hangman[i][j] = ' ';
@@ -37,7 +34,13 @@ void Hangman::init() {
   this->hangman[1][5] = '|';
 }
 
-void Hangman::increase_fails(int qtd) {
+void hangman::Hangman::close() {
+  if (file && file->is_open()) {
+    file->close();
+  }
+}
+
+void hangman::Hangman::increase_fails(int qtd) {
   this->fails += qtd;
   if (this->fails > this->max_attempts) {
     this->fails = this->max_attempts;
@@ -62,7 +65,7 @@ void Hangman::increase_fails(int qtd) {
     this->hangman[4][6] = '\\';
 }
 
-void Hangman::print() {
+void hangman::Hangman::print() {
   for (int i = 0; i < this->HEIGHT; ++i) {
     std::cout << '\t';
     for (int j = 0; j < this->WIDTH; ++j) {
@@ -72,14 +75,51 @@ void Hangman::print() {
   }
 }
 
-void Hangman::start() {
+hangman::Word hangman::Hangman::get_random_word() {
+  if (!file->is_open()) {
+    throw std::runtime_error("Arquivo não está aberto.");
+  }
+
+  file->clear();
+  file->seekg(0, std::ios::beg);
+
+  int qtd_rows = 0;
+
+  std::string row;
+
+  while (std::getline(*file, row)) {
+    qtd_rows++;
+  }
+
+  if (qtd_rows == 0) {
+    throw std::runtime_error("Arquivo está vazio.");
+  }
+
+  int index = std::rand() % qtd_rows;
+
+  file->clear();
+  file->seekg(0, std::ios::beg);
+  for (int i = 0; i <= index; ++i) {
+    std::getline(*file, row);
+  }
+
+  std::vector<std::string> word_splited = utils::split_string(row, ",");
+  hangman::Word word;
+
+  word.word = word_splited[0];
+  word.hint = word_splited[1];
+
+  return word;
+}
+
+void hangman::Hangman::start() {
   this->init();
   this->print();
   this->increase_fails(6);
   this->print();
 }
 
-Hangman::~Hangman() {
+hangman::Hangman::~Hangman() {
   if (file) {
     close();
     delete file;

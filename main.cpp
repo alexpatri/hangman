@@ -1,7 +1,7 @@
 #include "game/hangman.hpp"
 
 int main(void) {
-  Hangman *game = new Hangman("words.txt");
+  hangman::Hangman *game = new hangman::Hangman("words.txt");
   game->start();
 
   delete game;
