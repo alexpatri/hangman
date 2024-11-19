@@ -1,6 +1,8 @@
 #include "hangman.hpp"
 #include "utils/utils.hpp"
 
+#include <cctype>
+#include <charconv>
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
@@ -22,20 +24,24 @@ hangman::Hangman::Hangman(const std::string &file_path) {
 }
 
 void hangman::Hangman::init() {
+  setlocale(LC_ALL, "portuguese");
+
   for (int i = 0; i < this->HEIGHT; ++i) {
     for (int j = 0; j < this->WIDTH; ++j) {
       this->hangman[i][j] = ' ';
     }
   }
 
+  char c = 219;
+
   for (int i = 0; i < this->HEIGHT; ++i) {
-    this->hangman[i][0] = '|';
+    this->hangman[i][0] = c;
   }
 
   for (int j = 0; j < 6; ++j) {
-    this->hangman[0][j] = '-';
+    this->hangman[0][j] = c;
   }
-  this->hangman[1][5] = '|';
+  this->hangman[1][5] = 219;
 }
 
 void hangman::Hangman::close() {
@@ -134,6 +140,9 @@ void hangman::Hangman::get_new_word_from_user() {
     std::cout << "Digite a nova palavra: ";
     std::getline(std::cin, new_word);
 
+    new_word = utils::remove_accents(new_word);
+    new_word = utils::to_lower_case(new_word);
+
     if (!new_word.empty()) {
       break;
     }
@@ -155,7 +164,7 @@ void hangman::Hangman::get_new_word_from_user() {
   file->clear();
   file->seekp(0, std::ios::end);
 
-  *file << new_word << "," << new_hint << std::endl;
+  *file << new_word << "," << new_hint << '\n';
 
   std::cout << "Nova palavra e dica adicionadas com sucesso!\n";
 }
@@ -176,22 +185,24 @@ void hangman::Hangman::start() {
               << '\n';
     std::cout << "Letras já tentadas: " << guessed_letters << '\n';
 
-    char guess;
+    std::string guess;
     std::cout << "Digite uma letra: ";
     std::cin >> guess;
 
-    if (guessed_letters.find(guess) != std::string::npos) {
+    char guess_char = utils::get_raw_char(guess);
+
+    if (guessed_letters.find(guess_char) != std::string::npos) {
       utils::clear_screan();
       std::cout << "Você já tentou essa letra.\n";
       continue;
     }
 
-    guessed_letters += guess;
+    guessed_letters += guess_char;
 
     bool found = false;
     for (size_t i = 0; i < word.word.length(); ++i) {
-      if (word.word[i] == guess) {
-        word_display[i] = guess;
+      if (word.word[i] == guess_char) {
+        word_display[i] = guess_char;
         found = true;
       }
     }
