@@ -1,5 +1,6 @@
-computador,dispositivo eletrônico
-guitarra,instrumento musical
-taekwondo,esporte olímpico
-sombrero,usado na cabeça
-júpter,Um dos planetas gasosos do nosso sistema solar
+computador,Dispositivo eletrônico
+guitarra,Instrumento musical
+taekwondo,Esporte olímpico
+sombrero,Usado na cabeça
+jupter,Um dos planetas gasosos do nosso sistema solar
+alagoas,Estado do Nordeste do país
