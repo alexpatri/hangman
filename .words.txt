@@ -2,3 +2,4 @@ computador,dispositivo eletrônico
 guitarra,instrumento musical
 taekwondo,esporte olímpico
 sombrero,usado na cabeça
+júpter,Um dos planetas gasosos do nosso sistema solar
