@@ -83,8 +83,9 @@ void hangman::Hangman::print(const std::string &word_display) {
   }
 
   std::cout << "Palavra: ";
-  for (char c : word_display) {
-    std::cout << c << ' ';
+  std::cout << (char)toupper(word_display[0]) << ' ';
+  for (int i = 1; i < word_display.length(); i++) {
+    std::cout << word_display[i] << ' ';
   }
   std::cout << '\n';
 }
