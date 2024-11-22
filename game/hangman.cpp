@@ -1,6 +1,7 @@
 #include "hangman.hpp"
 #include "utils/utils.hpp"
 
+#include <algorithm>
 #include <cctype>
 #include <charconv>
 #include <cstdlib>
@@ -25,24 +26,20 @@ hangman::Hangman::Hangman(const std::string &file_path) {
 }
 
 void hangman::Hangman::init() {
-  setlocale(LC_ALL, "portuguese");
-
   for (int i = 0; i < this->HEIGHT; ++i) {
     for (int j = 0; j < this->WIDTH; ++j) {
       this->hangman[i][j] = ' ';
     }
   }
 
-  char c = 219;
-
   for (int i = 0; i < this->HEIGHT; ++i) {
-    this->hangman[i][0] = c;
+    this->hangman[i][0] = '|';
   }
 
   for (int j = 0; j < 6; ++j) {
-    this->hangman[0][j] = c;
+    this->hangman[0][j] = '-';
   }
-  this->hangman[1][5] = 219;
+  this->hangman[1][5] = '|';
 }
 
 void hangman::Hangman::close() {
@@ -92,13 +89,17 @@ void hangman::Hangman::print(const std::string &word_display) {
   std::cout << '\n';
 }
 
-void hangman::Hangman::play_defeat_sound() {
-  int frequencies[] = {600, 400, 200};
-  int duration_ms = 300;
+void hangman::Hangman::play_win_sound() {
+  utils::play_beep(500, 400);
+  utils::play_beep(600, 400);
+  utils::play_beep(700, 400);
+  utils::play_beep(900, 600);
+}
 
-  for (int freq : frequencies) {
-    utils::play_beep(freq, duration_ms);
-  }
+void hangman::Hangman::play_defeat_sound() {
+  utils::play_beep(700, 300);
+  utils::play_beep(400, 300);
+  utils::play_beep(200, 400);
 }
 
 hangman::Word hangman::Hangman::get_random_word() {
@@ -180,12 +181,13 @@ void hangman::Hangman::get_new_word_from_user() {
 }
 
 void hangman::Hangman::start() {
+  utils::clear_screan();
   this->init();
 
   hangman::Word word = this->get_random_word();
 
   std::string word_display(word.word.length(), '_');
-  std::string guessed_letters;
+  std::vector<char> guessed_letters;
 
   while (this->fails < this->max_attempts) {
     std::cout << "Dica: " << word.hint << '\n';
@@ -193,21 +195,32 @@ void hangman::Hangman::start() {
     this->print(word_display);
     std::cout << "Tentativas restantes: " << (this->max_attempts - this->fails)
               << '\n';
-    std::cout << "Letras já tentadas: " << guessed_letters << '\n';
+
+    std::cout << "Letras já tentadas: ";
+    for (int i = 0; i < guessed_letters.size(); i++) {
+      std::cout << guessed_letters[i];
+      if (i + 1 != guessed_letters.size())
+        std::cout << ", ";
+    }
+    std::cout << '\n';
 
     std::string guess;
     std::cout << "Digite uma letra: ";
     std::cin >> guess;
 
     char guess_char = utils::get_raw_char(guess);
+    guess_char = tolower(guess_char);
 
-    if (guessed_letters.find(guess_char) != std::string::npos) {
+    auto it =
+        std::find(guessed_letters.begin(), guessed_letters.end(), guess_char);
+
+    if (it != guessed_letters.end()) {
       utils::clear_screan();
       std::cout << "Você já tentou essa letra.\n";
       continue;
     }
 
-    guessed_letters += guess_char;
+    guessed_letters.push_back(guess_char);
 
     bool found = false;
     for (size_t i = 0; i < word.word.length(); ++i) {
@@ -225,6 +238,7 @@ void hangman::Hangman::start() {
     utils::clear_screan();
 
     if (word_display == word.word) {
+      this->play_win_sound();
       std::cout << "Parabéns! Você acertou a palavra: " << word.word << '\n';
       this->print(word_display);
       this->get_new_word_from_user();

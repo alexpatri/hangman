@@ -27,6 +27,7 @@ private:
   Word get_random_word();
   void get_new_word_from_user();
   void play_defeat_sound();
+  void play_win_sound();
 
 public:
   Hangman(const std::string &);

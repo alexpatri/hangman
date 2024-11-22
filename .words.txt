@@ -2,5 +2,5 @@ computador,Dispositivo eletrônico
 guitarra,Instrumento musical
 taekwondo,Esporte olímpico
 sombrero,Usado na cabeça
-jupter,Um dos planetas gasosos do nosso sistema solar
-alagoas,Estado do Nordeste do país
+jupiter,Um dos planetas gasosos do nosso sistema solar
+pernambuco,Estado do Nordeste do país
