@@ -9,6 +9,7 @@
 #include <iostream>
 #include <limits>
 #include <string>
+#include <thread>
 #include <vector>
 
 hangman::Hangman::Hangman(const std::string &file_path) {
@@ -89,6 +90,15 @@ void hangman::Hangman::print(const std::string &word_display) {
     std::cout << c << ' ';
   }
   std::cout << '\n';
+}
+
+void hangman::Hangman::play_defeat_sound() {
+  int frequencies[] = {600, 400, 200};
+  int duration_ms = 300;
+
+  for (int freq : frequencies) {
+    utils::play_beep(freq, duration_ms);
+  }
 }
 
 hangman::Word hangman::Hangman::get_random_word() {
@@ -222,6 +232,7 @@ void hangman::Hangman::start() {
     }
   }
 
+  this->play_defeat_sound();
   std::cout << "Você perdeu! A palavra era: " << word.word << '\n';
   this->print(word_display);
 }

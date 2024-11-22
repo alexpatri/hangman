@@ -19,6 +19,8 @@ char get_raw_char(const std::string &);
 std::string remove_accents(const std::string &);
 
 std::string to_lower_case(const std::string &);
+
+void play_beep(int, int);
 } // namespace utils
 
 #endif // !UTILS_

@@ -1,7 +1,10 @@
 #include "utils.hpp"
 
+#include <SDL2/SDL.h>
 #include <cctype>
+#include <cmath>
 #include <cstdlib>
+#include <iostream>
 #include <string>
 
 std::vector<std::string> utils::split_string(const std::string &s,
@@ -83,4 +86,56 @@ std::string utils::to_lower_case(const std::string &word) {
   }
 
   return result;
+}
+
+void utils::play_beep(int frequency, int duration_ms) {
+  if (SDL_Init(SDL_INIT_AUDIO) < 0) {
+    std::cerr << "Falha ao inicializar SDL: " << SDL_GetError() << std::endl;
+    return;
+  }
+
+  SDL_AudioSpec desiredSpec;
+  SDL_AudioSpec obtainedSpec;
+
+  // Configuração do áudio
+  SDL_memset(&desiredSpec, 0, sizeof(desiredSpec));
+  desiredSpec.freq = 44100;
+  desiredSpec.format = AUDIO_F32;
+  desiredSpec.channels = 1;
+  desiredSpec.samples = 4096;
+  desiredSpec.callback = nullptr;
+
+  // Inicializar dispositivo de áudio
+  SDL_AudioDeviceID device =
+      SDL_OpenAudioDevice(nullptr, 0, &desiredSpec, &obtainedSpec, 0);
+  if (!device) {
+    std::cerr << "Falha ao abrir dispositivo de áudio: " << SDL_GetError()
+              << std::endl;
+    SDL_Quit();
+    return;
+  }
+
+  // Gerar som senoidal (beep)
+  int sampleCount = (obtainedSpec.freq * duration_ms) / 1000;
+  float *buffer = new float[sampleCount];
+
+  double phaseIncrement = 2.0 * M_PI * frequency / obtainedSpec.freq;
+  double phase = 0.0;
+
+  for (int i = 0; i < sampleCount; ++i) {
+    buffer[i] = static_cast<float>(sin(phase));
+    phase += phaseIncrement;
+    if (phase >= 2.0 * M_PI)
+      phase -= 2.0 * M_PI;
+  }
+
+  // Tocar o som
+  SDL_QueueAudio(device, buffer, sampleCount * sizeof(float));
+  SDL_PauseAudioDevice(device, 0);
+  SDL_Delay(duration_ms);
+
+  // Limpar
+  SDL_CloseAudioDevice(device);
+  delete[] buffer;
+  SDL_Quit();
 }

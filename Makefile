@@ -1,2 +1,2 @@
 build:
-	@g++ main.cpp game/hangman.cpp game/utils/utils.cpp -o hangman
+	@g++ main.cpp game/hangman.cpp game/utils/utils.cpp -lSDL2 -o hangman
