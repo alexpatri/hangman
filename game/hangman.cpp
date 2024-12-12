@@ -13,6 +13,12 @@
 #include <thread>
 #include <vector>
 
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <unistd.h>
+#endif
+
 hangman::Hangman::Hangman(const std::string &file_path) {
   file = new std::fstream(file_path, std::fstream::out | std::fstream::app |
                                          std::fstream::in);
@@ -91,16 +97,43 @@ void hangman::Hangman::print(const std::string &word_display) {
 }
 
 void hangman::Hangman::play_win_sound() {
-  utils::play_beep(500, 400);
-  utils::play_beep(600, 400);
-  utils::play_beep(700, 400);
-  utils::play_beep(900, 600);
+  std::vector<utils::Note> march = {{659, 187}, {0, 50},   {659, 187}, {0, 50},
+                                    {659, 93},  {523, 93}, {783, 375}};
+
+  for (const auto &note : march) {
+    if (note.frequency == 0) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(note.duration));
+    } else {
+      utils::play_beep(note.frequency, note.duration);
+    }
+  }
 }
 
-void hangman::Hangman::play_defeat_sound() {
-  utils::play_beep(700, 300);
-  utils::play_beep(400, 300);
-  utils::play_beep(200, 400);
+void hangman::Hangman::play_lose_sound() {
+  std::vector<utils::Note> march = {
+      {146, 375}, {0, 100}, {146, 375}, {0, 100}, {146, 187}, {0, 50},
+      {146, 375}, {0, 100}, {174, 375}, {0, 100}, {164, 187}, {0, 50},
+      {164, 375}, {0, 100}, {146, 187}, {0, 50},  {146, 375}, {0, 100},
+      {146, 187}, {0, 50},  {146, 750}};
+
+  for (const auto &note : march) {
+    if (note.frequency == 0) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(note.duration));
+    } else {
+      utils::play_beep(note.frequency, note.duration);
+    }
+  }
+}
+
+void hangman::Hangman::show_win_msg(hangman::Word w, const std::string &wd) {
+  std::cout << "Parabéns! Você acertou a palavra: " << w.word << '\n';
+  this->print(wd);
+  this->get_new_word_from_user();
+}
+
+void hangman::Hangman::show_lose_msg(hangman::Word w, const std::string &wd) {
+  std::cout << "Você perdeu! A palavra era: " << w.word << '\n';
+  this->print(wd);
 }
 
 hangman::Word hangman::Hangman::get_random_word() {
@@ -239,17 +272,22 @@ void hangman::Hangman::start() {
     utils::clear_screan();
 
     if (word_display == word.word) {
-      this->play_win_sound();
-      std::cout << "Parabéns! Você acertou a palavra: " << word.word << '\n';
-      this->print(word_display);
-      this->get_new_word_from_user();
+      std::thread win_sound(&hangman::Hangman::play_win_sound, this);
+      std::thread win_msg(&hangman::Hangman::show_win_msg, this, word,
+                          word_display);
+
+      win_sound.join();
+      win_msg.join();
       return;
     }
   }
 
-  this->play_defeat_sound();
-  std::cout << "Você perdeu! A palavra era: " << word.word << '\n';
-  this->print(word_display);
+  std::thread lose_sound(&hangman::Hangman::play_lose_sound, this);
+  std::thread lose_msg(&hangman::Hangman::show_lose_msg, this, word,
+                       word_display);
+
+  lose_sound.join();
+  lose_msg.join();
 }
 
 hangman::Hangman::~Hangman() {

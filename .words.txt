@@ -4,3 +4,4 @@ taekwondo,Esporte olímpico
 sombrero,Usado na cabeça
 jupiter,Um dos planetas gasosos do nosso sistema solar
 pernambuco,Estado do Nordeste do país
+microfone,Equipamnto usado por músicos

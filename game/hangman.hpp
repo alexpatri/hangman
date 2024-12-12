@@ -26,8 +26,10 @@ private:
   void increase_fails(int);
   Word get_random_word();
   void get_new_word_from_user();
-  void play_defeat_sound();
+  void play_lose_sound();
   void play_win_sound();
+  void show_lose_msg(Word, const std::string &);
+  void show_win_msg(Word, const std::string &);
 
 public:
   Hangman(const std::string &);

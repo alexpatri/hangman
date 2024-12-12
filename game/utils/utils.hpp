@@ -10,6 +10,11 @@ std::vector<std::string> split_string(const std::string &, const std::string &);
 void clear_screan();
 
 typedef struct {
+  int frequency;
+   int duration;
+} Note;
+
+typedef struct {
   std::string c;
   char equivalent;
 } Charmap;
