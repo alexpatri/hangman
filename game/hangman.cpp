@@ -96,11 +96,37 @@ void hangman::Hangman::print(const std::string &word_display) {
   std::cout << '\n';
 }
 
+void hangman::Hangman::play_right_char_sound() {
+  std::vector<utils::Note> sound = {
+      {220, 125}, {0, 50}, {440, 125}, {0, 50}, {880, 125}};
+
+  for (const auto &note : sound) {
+    if (note.frequency == 0) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(note.duration));
+    } else {
+      utils::play_beep(note.frequency, note.duration);
+    }
+  }
+}
+
+void hangman::Hangman::play_wrong_char_sound() {
+  std::vector<utils::Note> sound = {
+      {880, 125}, {0, 50}, {440, 125}, {0, 50}, {220, 125}};
+
+  for (const auto &note : sound) {
+    if (note.frequency == 0) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(note.duration));
+    } else {
+      utils::play_beep(note.frequency, note.duration);
+    }
+  }
+}
+
 void hangman::Hangman::play_win_sound() {
-  std::vector<utils::Note> march = {{659, 187}, {0, 50},   {659, 187}, {0, 50},
+  std::vector<utils::Note> sound = {{659, 187}, {0, 50},   {659, 187}, {0, 50},
                                     {659, 93},  {523, 93}, {783, 375}};
 
-  for (const auto &note : march) {
+  for (const auto &note : sound) {
     if (note.frequency == 0) {
       std::this_thread::sleep_for(std::chrono::milliseconds(note.duration));
     } else {
@@ -110,13 +136,13 @@ void hangman::Hangman::play_win_sound() {
 }
 
 void hangman::Hangman::play_lose_sound() {
-  std::vector<utils::Note> march = {
+  std::vector<utils::Note> sound = {
       {146, 375}, {0, 100}, {146, 375}, {0, 100}, {146, 187}, {0, 50},
       {146, 375}, {0, 100}, {174, 375}, {0, 100}, {164, 187}, {0, 50},
       {164, 375}, {0, 100}, {146, 187}, {0, 50},  {146, 375}, {0, 100},
       {146, 187}, {0, 50},  {146, 750}};
 
-  for (const auto &note : march) {
+  for (const auto &note : sound) {
     if (note.frequency == 0) {
       std::this_thread::sleep_for(std::chrono::milliseconds(note.duration));
     } else {
@@ -266,7 +292,10 @@ void hangman::Hangman::start() {
 
     if (!found) {
       std::cout << "Letra incorreta!\n";
+      this->play_wrong_char_sound();
       this->increase_fails(1);
+    } else {
+      this->play_right_char_sound();
     }
 
     utils::clear_screan();

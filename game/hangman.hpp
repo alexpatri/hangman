@@ -26,6 +26,8 @@ private:
   void increase_fails(int);
   Word get_random_word();
   void get_new_word_from_user();
+  void play_wrong_char_sound();
+  void play_right_char_sound();
   void play_lose_sound();
   void play_win_sound();
   void show_lose_msg(Word, const std::string &);
